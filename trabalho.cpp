@@ -32,8 +32,8 @@ void peneira (int m, int *v);
 void selectionSort(int vet[], long int tam,dado *dados);
 
 void mergeSort(int vet[], int tam, dado *dados);
-void mergeDiv(int *V, long int inicio, long int fim);
-void merge(int *V, long int inicio, long int meio, long int fim);
+void Msort(int *v, int *c, int i, int f);
+void merge(int *v, int *c, int i, int m, int f);
 
 void radixSort(int *V, long int tam, dado *dados);
 
@@ -166,56 +166,51 @@ void selectionSort(int vet[],long int tam,dado *dados){
 	printf("%f\n",dados[2].tempo);
 	
 }
-/*==============Inicio MergeSort=============================*/
-
-void mergeSort(int vet[], int tam, dado *dados) {
+/*==============Inicio MergeSort===========================*/
+void mergeSort(int *v, int tam, dado *dados) {
     printf("\nIniciando MergeSort - Aguarde...\n");
     clock_t t0, tf;
     t0 = clock();
-    mergeDiv(vet, 0, tam - 1);
+    int *c = (int*) malloc(sizeof (int) * tam);
+    Msort(v, c, 0, tam - 1);
+    free(c);
     tf = clock();
     dados[6].tempo = ((tf - t0) / (CLOCKS_PER_SEC / 1000));
     printf("%f\n", dados[6].tempo);
 }
 
-void mergeDiv(int *V, long int inicio, long int fim) {
-    long int meio;
-    if (inicio < fim) {
-        meio = floor((inicio + fim) / 2);
-        mergeDiv(V, inicio, meio);
-        mergeDiv(V, meio + 1, fim);
-        merge(V, inicio, meio, fim);
-    }
+void Msort(int *v, int *c, int i, int f) {
+    if (i >= f) return;
+
+    int m = (i + f) / 2;
+
+    Msort(v, c, i, m);
+    Msort(v, c, m + 1, f);
+
+    /* Se v[m] <= v[m + 1], então v[i..f] já está ordenado. */
+    if (v[m] <= v[m + 1]) return;
+
+    merge(v, c, i, m, f);
 }
 
-void merge(int *V, long int inicio, long int meio, long int fim) {
-    int *temp;
-    long int p1, p2, tamanho, i, j, k;
-    long int fim1 = 0, fim2 = 0;
-    tamanho = fim - inicio;
-    p1 = inicio;
-    p2 = meio + 1;
-    temp = (int*) malloc(tamanho * sizeof (int));
-    if (temp != NULL) {
-        for (int i = 0; i < tamanho; i++) {
-            if (!fim1 && fim2) {
-                if (V[p1] < V[p2]) {
-                    temp[i] = V[p1++];
-                } else {
-                    temp[i] = V[p2++];
-                }
-                if (p1 > meio) fim1 = 1;
-                if (p2 > fim) fim2 = 1;
-            } else {
-                if (!fim1) temp[i] = V[p1++];
-                else temp[i] = V[p2++];
-            }
-        }
-        for (int j = 0; j < tamanho; j++) {
-            V[k] = temp[j];
-        }
-        free(temp);
+void merge(int *v, int *c, int i, int m, int f) {
+    int z,
+            iv = i, ic = m + 1;
+
+    for (z = i; z <= f; z++) c[z] = v[z];
+
+    z = i;
+
+    while (iv <= m && ic <= f) {
+        /* Invariante: v[i..z] possui os valores de v[iv..m] e v[ic..f] em ordem crescente. */
+
+        if (c[iv] < c[ic]) v[z++] = c[iv++];
+        else /* if (c[iv] > c[ic]) */ v[z++] = c[ic++];
     }
+
+    while (iv <= m) v[z++] = c[iv++];
+
+    while (ic <= f) v[z++] = c[ic++];
 }
 /*==============Fim MergeSort=============================*/
 
