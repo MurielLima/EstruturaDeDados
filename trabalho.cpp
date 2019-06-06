@@ -13,8 +13,8 @@ struct dado{
 //Aloca o vetor de numeros
 int  *alocvet(long int tam);
 /*
-   Recebe um Vetor e um número n.
-   Gera n números pseudo aleatórios e insere cada um no Vetor.
+   Recebe um Vetor e um nÃºmero n.
+   Gera n nÃºmeros pseudo aleatÃ³rios e insere cada um no Vetor.
 */
 void incluiElementos(int* vetor,int* vetor1,int* vetor2,int* vetor3,int* vetor4,int* vetor5,int* vetor6,int* vetor7,  long int n);
 // Salva a em disco. Somente entradas preenchidas.
@@ -31,6 +31,11 @@ void peneira (int m, int *v);
 
 void selectionSort(int vet[], long int tam,dado *dados);
 
+void mergeSort(int vet[], int tam, dado *dados);
+void Msort(int *v, int *c, int i, int f);
+void merge(int *v, int *c, int i, int m, int f);
+
+void radixSort(int *V, long int tam, dado *dados);
 
 int main(){
 	srand(time(NULL));
@@ -80,13 +85,15 @@ int main(){
 	  
 	  heapSort(Vet0,tam,dados);
 	  selectionSort(Vet1,tam,dados);
+	  mergeSort(Vet6, tam, dados);
+    	  radixSort(Vet7, tam, dados);
 
 	  
 	salvar("C:\\Engenharia-de-Software\\Ordenacao3.txt",dados,n);
 }
 /*
 ======================================================================
-===============FUNÇÕES DE ORDENAÇÃO===================================
+===============FUNÃ‡Ã•ES DE ORDENAÃ‡ÃƒO===================================
 ======================================================================
 */
 void peneira (int m, int *v)
@@ -123,7 +130,7 @@ void criaheap(int *v,long int m){
 	
 long int k,aux; 
    for (k = 1; k < m; ++k) {                   
-      // v[1..k] é um heap
+      // v[1..k] Ã© um heap
       int f = k+1;
       while (f > 1 && v[f/2] < v[f]) {  // 5
                 // 6
@@ -159,6 +166,90 @@ void selectionSort(int vet[],long int tam,dado *dados){
 	printf("%f\n",dados[2].tempo);
 	
 }
+/*==============Inicio MergeSort===========================*/
+void mergeSort(int *v, int tam, dado *dados) {
+    printf("\nIniciando MergeSort - Aguarde...\n");
+    clock_t t0, tf;
+    t0 = clock();
+    int *c = (int*) malloc(sizeof (int) * tam);
+    Msort(v, c, 0, tam - 1);
+    free(c);
+    tf = clock();
+    dados[6].tempo = ((tf - t0) / (CLOCKS_PER_SEC / 1000));
+    printf("%f\n", dados[6].tempo);
+}
+
+void Msort(int *v, int *c, int i, int f) {
+    if (i >= f) return;
+
+    int m = (i + f) / 2;
+
+    Msort(v, c, i, m);
+    Msort(v, c, m + 1, f);
+
+    /* Se v[m] <= v[m + 1], entÃ£o v[i..f] jÃ¡ estÃ¡ ordenado. */
+    if (v[m] <= v[m + 1]) return;
+
+    merge(v, c, i, m, f);
+}
+
+void merge(int *v, int *c, int i, int m, int f) {
+    int z,
+            iv = i, ic = m + 1;
+
+    for (z = i; z <= f; z++) c[z] = v[z];
+
+    z = i;
+
+    while (iv <= m && ic <= f) {
+        /* Invariante: v[i..z] possui os valores de v[iv..m] e v[ic..f] em ordem crescente. */
+
+        if (c[iv] < c[ic]) v[z++] = c[iv++];
+        else /* if (c[iv] > c[ic]) */ v[z++] = c[ic++];
+    }
+
+    while (iv <= m) v[z++] = c[iv++];
+
+    while (ic <= f) v[z++] = c[ic++];
+}
+/*==============Fim MergeSort=============================*/
+
+
+void radixSort(int *V, long int tam, dado *dados) {
+    long int i, exp = 1, m = 0;
+    int bucket[tam], temp[tam];
+    printf("\nIniciando radixSort - Aguarde...\n");
+    clock_t t0, tf;
+    t0 = clock();
+    for (i = 0; i < tam; i++) {
+        if (V[i] > m) {
+            m = V[i];
+        }
+    }
+
+    while ((m / exp) > 0) {
+        for (i = 0; i < tam; i++) {
+            bucket[i] = 0;
+        }
+        for (i = 0; i < tam; i++) {
+            bucket[(V[i] / exp) % 10]++;
+        }
+        for (i = 1; i < tam; i++) {
+            bucket[i] += bucket[i - 1];
+        }
+        for (i = (tam - 1); i >= 0; i--) {
+            temp[--bucket[(V[i] / exp) % 10]] = V[i];
+        }
+        for (i = 0; i < tam; i++) {
+            V[i] = temp[i];
+        }
+        exp *= 10;
+    }
+    tf = clock();
+    dados[7].tempo = ((tf - t0) / (CLOCKS_PER_SEC / 1000));
+    printf("%f\n", dados[7].tempo);
+}
+
 /*
 ======================================================================
 ======================================================================
@@ -167,7 +258,7 @@ void selectionSort(int vet[],long int tam,dado *dados){
 
 /*
 ======================================================================
-===============FUNÇÕES DE ORGANIZAÇÃO=================================
+===============FUNÃ‡Ã•ES DE ORGANIZAÃ‡ÃƒO=================================
 ======================================================================
 */
 //Aloca o vetor de numeros
@@ -180,8 +271,8 @@ int  *alocvet( long int tam){
     return v;
 }
 /*
-   Recebe um Vetor e um número n.
-   Gera n números pseudo aleatórios e insere cada um no Vetor.
+   Recebe um Vetor e um nÃºmero n.
+   Gera n nÃºmeros pseudo aleatÃ³rios e insere cada um no Vetor.
 */
 void incluiElementos(int* vetor,int* vetor1,int* vetor2,int* vetor3,int* vetor4,int* vetor5,int* vetor6,int* vetor7,  long int n) {
     long int i;
